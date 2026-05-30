@@ -16,7 +16,7 @@ export async function apiRequest(path, options = {}) {
     ...headers,
   }
 
-  const token = auth && firebaseAuth.currentUser
+  const token = auth && firebaseAuth?.currentUser
     ? await firebaseAuth.currentUser.getIdToken()
     : null
 

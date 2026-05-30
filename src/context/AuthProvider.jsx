@@ -8,9 +8,16 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth'
-import { auth, googleProvider } from '../config/firebase.js'
+import {
+  auth,
+  googleProvider,
+  isFirebaseConfigured,
+} from '../config/firebase.js'
 import { getCurrentUser } from '../services/authService.js'
 import { AuthContext } from './authContext.js'
+
+const FIREBASE_SETUP_MESSAGE =
+  'Firebase is not configured. Add the VITE_FIREBASE_* environment variables and redeploy.'
 
 function getFirebaseErrorMessage(error) {
   const messages = {
@@ -31,13 +38,14 @@ function clearAuthState(setUser, setToken, setClaims) {
 }
 
 function AuthProvider({ children }) {
+  const isFirebaseAuthAvailable = isFirebaseConfigured && Boolean(auth)
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
   const [claims, setClaims] = useState({})
-  const [isAuthReady, setIsAuthReady] = useState(false)
+  const [isAuthReady, setIsAuthReady] = useState(() => !isFirebaseAuthAvailable)
 
   const loadCurrentUser = useCallback(async (firebaseUser, forceRefresh = false) => {
-    if (!firebaseUser) {
+    if (!firebaseUser || !auth) {
       return { user: null, token: null, claims: {} }
     }
 
@@ -65,6 +73,10 @@ function AuthProvider({ children }) {
   )
 
   useEffect(() => {
+    if (!isFirebaseAuthAvailable) {
+      return undefined
+    }
+
     let isMounted = true
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -93,10 +105,14 @@ function AuthProvider({ children }) {
       isMounted = false
       unsubscribe()
     }
-  }, [loadCurrentUser])
+  }, [isFirebaseAuthAvailable, loadCurrentUser])
 
   const signIn = useCallback(
     async ({ email, password }) => {
+      if (!auth) {
+        throw new Error(FIREBASE_SETUP_MESSAGE)
+      }
+
       try {
         const result = await signInWithEmailAndPassword(auth, email, password)
         return syncCurrentUser(result.user, true)
@@ -109,6 +125,10 @@ function AuthProvider({ children }) {
 
   const signUp = useCallback(
     async ({ name, email, password }) => {
+      if (!auth) {
+        throw new Error(FIREBASE_SETUP_MESSAGE)
+      }
+
       try {
         const result = await createUserWithEmailAndPassword(
           auth,
@@ -126,6 +146,10 @@ function AuthProvider({ children }) {
   )
 
   const signInWithGoogle = useCallback(async () => {
+    if (!auth || !googleProvider) {
+      throw new Error(FIREBASE_SETUP_MESSAGE)
+    }
+
     try {
       const result = await signInWithPopup(auth, googleProvider)
       return syncCurrentUser(result.user, true)
@@ -135,7 +159,10 @@ function AuthProvider({ children }) {
   }, [syncCurrentUser])
 
   const logout = useCallback(async () => {
-    await signOut(auth)
+    if (auth) {
+      await signOut(auth)
+    }
+
     clearAuthState(setUser, setToken, setClaims)
   }, [])
 

@@ -10,11 +10,15 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '',
 }
 
-const app = initializeApp(firebaseConfig)
+export const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean)
 
-export const auth = getAuth(app)
-export const googleProvider = new GoogleAuthProvider()
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null
 
-googleProvider.setCustomParameters({
-  prompt: 'select_account',
-})
+export const auth = app ? getAuth(app) : null
+export const googleProvider = app ? new GoogleAuthProvider() : null
+
+if (googleProvider) {
+  googleProvider.setCustomParameters({
+    prompt: 'select_account',
+  })
+}
