@@ -5,19 +5,13 @@ import { useBlogs } from '../hooks/useBlogs.js'
 import { ROUTES } from '../routes/routePaths.js'
 
 function HomePage() {
-  const { blogs, isLoading, error } = useBlogs()
+  const { blogs, isLoading } = useBlogs()
   const featuredBlog = blogs.find((blog) => blog.featured) || blogs[0]
   const latestBlogs = blogs.filter((blog) => blog._id !== featuredBlog?._id)
 
   return (
     <div className="space-y-16">
       <HeroSection />
-
-      {error ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
-          Showing demo editorials until MongoDB Atlas is connected. {error}
-        </div>
-      ) : null}
 
       {isLoading ? (
         <p className="text-zinc-500">Loading editorials...</p>

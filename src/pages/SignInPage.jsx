@@ -46,7 +46,7 @@ function SignInPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
           Welcome back
         </p>
-        <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950">
+        <h1 className="mt-3 text-5xl font-semibold italic tracking-tight text-zinc-950">
           Sign in
         </h1>
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>

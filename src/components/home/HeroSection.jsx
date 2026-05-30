@@ -7,19 +7,19 @@ function HeroSection() {
     <section className="grid min-h-[620px] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr]">
       <div className="flex flex-col justify-between p-8 sm:p-10 lg:p-14">
         <p className="text-sm font-semibold uppercase tracking-[0.28em] text-emerald-300">
-          Luxury model blog
+          India-first editorial blog
         </p>
         <div>
-          <h1 className="max-w-2xl font-serif text-5xl italic tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-2xl text-5xl italic tracking-tight sm:text-6xl lg:text-7xl">
             {BRAND_NAME}
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-zinc-300">
-            Editorial fashion stories, casting-day guides, backstage beauty
-            notes, and model culture written with a restrained luxury eye.
+            Indian fashion stories, culture notes, beauty reports, and model
+            guides written with a refined editorial eye.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              className="  rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200"
               to={ROUTES.blogs}
             >
               Read editorials

@@ -9,7 +9,7 @@ import { formatDate } from '../utils/formatters.js'
 function BlogDetailPage() {
   const { slug } = useParams()
   const { isAdmin } = useAuth()
-  const { blog, comments, setComments, isLoading, error } = useBlogDetail(slug)
+  const { blog, comments, setComments, isLoading } = useBlogDetail(slug)
 
   if (isLoading) {
     return <LoadingScreen />
@@ -18,7 +18,7 @@ function BlogDetailPage() {
   if (!blog) {
     return (
       <section className="mx-auto max-w-2xl py-24 text-center">
-        <h1 className="font-serif text-5xl italic text-zinc-950">
+        <h1 className="text-5xl italic text-zinc-950">
           Editorial not found
         </h1>
       </section>
@@ -30,17 +30,11 @@ function BlogDetailPage() {
 
   return (
     <article className="mx-auto max-w-4xl">
-      {error ? (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
-          Showing demo content until MongoDB Atlas is connected. {error}
-        </div>
-      ) : null}
-
       <div className="text-center">
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
           {blog.category}
         </p>
-        <h1 className="mt-4 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950 md:text-7xl">
+        <h1 className="mt-4 text-5xl font-semibold italic tracking-tight text-zinc-950 md:text-7xl">
           {blog.title}
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-zinc-600">

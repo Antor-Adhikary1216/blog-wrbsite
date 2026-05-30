@@ -15,7 +15,7 @@ function BlogListPage() {
     }),
     [category, search],
   )
-  const { blogs, isLoading, error } = useBlogs({ params })
+  const { blogs, isLoading } = useBlogs({ params })
 
   function updateFilter(name, value) {
     const nextParams = new URLSearchParams(searchParams)
@@ -35,12 +35,12 @@ function BlogListPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
           Editorial archive
         </p>
-        <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950">
+        <h1 className="mt-3 text-5xl font-semibold italic tracking-tight text-zinc-950">
           Stories in motion
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-8 text-zinc-600">
           Browse runway analysis, model guides, beauty notes, and culture essays
-          from the Velvet Runway desk.
+          from the Blog India desk.
         </p>
       </section>
 
@@ -64,12 +64,6 @@ function BlogListPage() {
           ))}
         </select>
       </div>
-
-      {error ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
-          Showing demo editorials until MongoDB Atlas is connected. {error}
-        </div>
-      ) : null}
 
       {isLoading ? (
         <p className="text-zinc-500">Loading editorials...</p>

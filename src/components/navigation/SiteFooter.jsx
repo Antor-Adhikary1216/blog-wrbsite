@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FaFacebookF, FaGithub, FaInstagram } from 'react-icons/fa'
+import BrandLogo from '../common/BrandLogo.jsx'
 import Container from '../common/Container.jsx'
 import { BRAND_NAME, BLOG_CATEGORIES } from '../../utils/constants.js'
 import { PUBLIC_NAV_ITEMS, ROUTES } from '../../routes/routePaths.js'
@@ -85,19 +86,16 @@ function SiteFooter() {
       <Container className="py-12 sm:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.25fr_2fr]">
           <div>
-            <Link
-              className="font-serif text-4xl font-semibold italic tracking-tight text-zinc-950"
-              to={ROUTES.home}
-            >
-              {BRAND_NAME}
+            <Link to={ROUTES.home}>
+              <BrandLogo size="lg" />
             </Link>
             <p className="mt-4 max-w-sm leading-7 text-zinc-600">
-              Luxury model culture, runway notes, backstage beauty, and
-              editorial dispatches for readers with a precise eye.
+              India-focused fashion, culture, beauty, and editorial dispatches
+              for readers with a precise eye.
             </p>
             <a
               className="mt-6 inline-flex rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-              href="mailto:editorial@velvetrunway.com"
+              href="mailto:editorial@blogindia.com"
             >
               Pitch a story
             </a>
@@ -146,7 +144,7 @@ function SiteFooter() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-zinc-200 pt-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
           <p>Copyright (c) {year} Antor Adhikary. All rights reserved.</p>
-          <p>{BRAND_NAME} is crafted as a refined full-stack editorial.</p>
+          <p>{BRAND_NAME} is crafted as a refined India-first editorial.</p>
         </div>
       </Container>
     </footer>

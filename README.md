@@ -1,11 +1,11 @@
-# Velvet Runway
+# Blog India
 
-Responsive full-stack luxury model blog built with React, Tailwind CSS,
-Node.js, Express, JWT authentication, role-based access, and MongoDB Atlas.
+Responsive full-stack India-focused editorial blog built with React, Tailwind
+CSS, Node.js, Express, JWT authentication, role-based access, and MongoDB Atlas.
 
 ## Features
 
-- Public fashion/model blog homepage, archive, and detail pages.
+- Public India-focused blog homepage, archive, and detail pages.
 - Sign-up, sign-in, logout, JWT auth, and protected account routes.
 - Admin role flow with private invite code.
 - Admin blog management: create, edit, publish/draft, feature, and delete.

@@ -47,7 +47,7 @@ function BlogEditorPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
         Editorial desk
       </p>
-      <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950">
+      <h1 className="mt-3 text-5xl font-semibold italic tracking-tight text-zinc-950">
         {isEditing ? 'Edit blog' : 'New blog'}
       </h1>
       {error ? (

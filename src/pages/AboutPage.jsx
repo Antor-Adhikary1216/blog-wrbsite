@@ -8,15 +8,15 @@ function AboutPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
             About
           </p>
-          <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950 md:text-7xl">
-            A quieter kind of fashion authority.
+          <h1 className="mt-3 text-5xl font-semibold italic tracking-tight text-zinc-950 md:text-7xl">
+            India stories with an editorial eye.
           </h1>
         </div>
         <p className="text-lg leading-8 text-zinc-600">
-          {BRAND_NAME} is a model-focused editorial journal for runway notes,
-          casting-day style, backstage beauty, and the culture around modern
-          fashion work. The voice is polished, useful, and deliberately
-          restrained.
+          {BRAND_NAME} is an India-focused editorial journal for fashion,
+          culture, beauty, runway notes, model guides, and the creative energy
+          shaping modern Indian style. The voice is polished, useful, and
+          deliberately restrained.
         </p>
       </div>
 
@@ -24,15 +24,15 @@ function AboutPage() {
         {[
           {
             title: 'Editorial Eye',
-            text: 'Luxury fashion coverage with attention to silhouette, proportion, texture, and mood.',
+            text: 'Indian fashion coverage with attention to silhouette, proportion, texture, and mood.',
           },
           {
             title: 'Model Guide',
-            text: 'Practical notes for castings, portfolios, wardrobe, skin prep, and career presence.',
+            text: 'Practical notes for Indian castings, portfolios, wardrobe, skin prep, and career presence.',
           },
           {
             title: 'Backstage Culture',
-            text: 'Beauty, runway rhythm, and the small details that shape a season before the lights rise.',
+            text: 'Beauty, runway rhythm, and the cultural details that shape Indian style before the lights rise.',
           },
         ].map((item) => (
           <article
@@ -48,7 +48,7 @@ function AboutPage() {
       </div>
 
       <img
-        alt="Minimal luxury fashion editorial"
+        alt="Minimal Indian fashion editorial"
         className="h-[460px] w-full rounded-lg object-cover"
         src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1600&q=85"
       />

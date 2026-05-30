@@ -1,4 +1,4 @@
-export const BRAND_NAME = 'Velvet Runway'
+export const BRAND_NAME = 'Blog India'
 
 export const BLOG_CATEGORIES = [
   'Editorial',

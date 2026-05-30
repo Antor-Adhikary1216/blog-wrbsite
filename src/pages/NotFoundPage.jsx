@@ -7,7 +7,7 @@ function NotFoundPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
         404
       </p>
-      <h1 className="mt-4 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950">
+      <h1 className="mt-4 text-5xl font-semibold italic tracking-tight text-zinc-950">
         Page not found
       </h1>
       <p className="mt-3 text-zinc-600">

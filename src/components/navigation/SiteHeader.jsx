@@ -1,26 +1,33 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import BrandLogo from '../common/BrandLogo.jsx'
 import Container from '../common/Container.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
-import { BRAND_NAME } from '../../utils/constants.js'
 import { PUBLIC_NAV_ITEMS, ROUTES } from '../../routes/routePaths.js'
 
-function getNavLinkClass({ isActive }) {
-  return `transition hover:text-zinc-950 ${
-    isActive ? 'text-zinc-950' : 'text-zinc-500'
+function getDesktopNavLinkClass({ isActive }) {
+  return `rounded-full px-4 py-2 text-sm font-semibold transition ${
+    isActive
+      ? 'bg-zinc-950 text-white shadow-sm'
+      : 'text-zinc-500 hover:bg-white hover:text-zinc-950 hover:shadow-sm'
   }`
 }
 
 function DesktopNav({ isAdmin }) {
   return (
-    <nav className="hidden items-center gap-7 text-sm font-semibold uppercase tracking-[0.18em] md:flex">
+    <nav className="hidden items-center rounded-full border border-zinc-200/80 bg-zinc-100/80 p-1 shadow-inner shadow-zinc-200/60 backdrop-blur md:flex">
       {PUBLIC_NAV_ITEMS.map((item) => (
-        <NavLink className={getNavLinkClass} end={item.to === ROUTES.home} key={item.to} to={item.to}>
+        <NavLink
+          className={getDesktopNavLinkClass}
+          end={item.to === ROUTES.home}
+          key={item.to}
+          to={item.to}
+        >
           {item.label}
         </NavLink>
       ))}
       {isAdmin ? (
-        <NavLink className={getNavLinkClass} to={ROUTES.adminBlogs}>
+        <NavLink className={getDesktopNavLinkClass} to={ROUTES.adminBlogs}>
           Admin
         </NavLink>
       ) : null}
@@ -40,13 +47,13 @@ function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
       ]
 
   return (
-    <div className="border-t border-zinc-200 bg-white md:hidden">
-      <Container className="py-4">
-        <nav className="grid gap-2">
+    <div className="md:hidden">
+      <Container className="pb-4">
+        <nav className="rounded-2xl border border-zinc-200 bg-white p-2 shadow-2xl shadow-zinc-950/10">
           {[...PUBLIC_NAV_ITEMS, ...authLinks].map((item) => (
             <NavLink
               className={({ isActive }) =>
-                `rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] transition ${
+                `flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition ${
                   isActive
                     ? 'bg-zinc-950 text-white'
                     : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950'
@@ -58,11 +65,14 @@ function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
               to={item.to}
             >
               {item.label}
+              <span aria-hidden="true" className="text-xs opacity-50">
+                /
+              </span>
             </NavLink>
           ))}
           {isAuthenticated ? (
             <button
-              className="rounded-lg px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.18em] text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950"
+              className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950"
               type="button"
               onClick={() => {
                 logout()
@@ -70,6 +80,9 @@ function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
               }}
             >
               Logout
+              <span aria-hidden="true" className="text-xs opacity-50">
+                /
+              </span>
             </button>
           ) : null}
         </nav>
@@ -78,18 +91,38 @@ function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
   )
 }
 
+function MenuIcon({ isOpen }) {
+  return (
+    <span className="relative h-4 w-4" aria-hidden="true">
+      <span
+        className={`absolute left-0 top-1 h-0.5 w-4 rounded-full bg-current transition ${
+          isOpen ? 'translate-y-1 rotate-45' : ''
+        }`}
+      />
+      <span
+        className={`absolute bottom-1 left-0 h-0.5 w-4 rounded-full bg-current transition ${
+          isOpen ? '-translate-y-1 -rotate-45' : ''
+        }`}
+      />
+    </span>
+  )
+}
+
 function SiteHeader() {
   const { isAuthenticated, isAdmin, logout, user } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/75 backdrop-blur-xl">
       <Container className="flex min-h-20 items-center justify-between gap-4">
         <Link
           to={ROUTES.home}
-          className="shrink-0 font-serif text-3xl font-semibold italic tracking-tight text-zinc-950"
+          className="group shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-4"
         >
-          {BRAND_NAME}
+          <BrandLogo
+            className="transition group-hover:scale-[1.02]"
+            size="md"
+          />
         </Link>
 
         <DesktopNav isAdmin={isAdmin} />
@@ -97,21 +130,17 @@ function SiteHeader() {
         <div className="hidden items-center gap-3 md:flex">
           {isAuthenticated ? (
             <>
-              <span className="max-w-32 truncate text-sm text-zinc-500">
-                {user?.name}
-              </span>
-              <NavLink
-                className={({ isActive }) =>
-                  `text-sm font-semibold transition ${
-                    isActive ? 'text-zinc-950' : 'text-zinc-600'
-                  } hover:text-zinc-950`
-                }
+              <Link
+                className="flex max-w-44 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-zinc-950 hover:text-zinc-950"
                 to={ROUTES.account}
               >
-                Account
-              </NavLink>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold uppercase text-emerald-900">
+                  {user?.name?.charAt(0) || 'U'}
+                </span>
+                <span className="truncate">{user?.name || 'Account'}</span>
+              </Link>
               <button
-                className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-950 hover:text-zinc-950"
+                className="rounded-full px-4 py-2 text-sm font-semibold text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
                 type="button"
                 onClick={logout}
               >
@@ -122,16 +151,18 @@ function SiteHeader() {
             <>
               <NavLink
                 className={({ isActive }) =>
-                  `text-sm font-semibold transition ${
-                    isActive ? 'text-zinc-950' : 'text-zinc-600'
-                  } hover:text-zinc-950`
+                  `rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? 'bg-zinc-100 text-zinc-950'
+                      : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950'
+                  }`
                 }
                 to={ROUTES.signIn}
               >
                 Sign in
               </NavLink>
               <Link
-                className="rounded-full bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-zinc-950/15 transition hover:-translate-y-0.5 hover:bg-emerald-800"
                 to={ROUTES.signUp}
               >
                 Join
@@ -142,11 +173,13 @@ function SiteHeader() {
 
         <button
           aria-expanded={isMenuOpen}
-          className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-zinc-700 md:hidden"
+          aria-label="Toggle navigation menu"
+          className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-zinc-950 hover:text-zinc-950 md:hidden"
           type="button"
           onClick={() => setIsMenuOpen((current) => !current)}
         >
-          {isMenuOpen ? 'Close' : 'Menu'}
+          <MenuIcon isOpen={isMenuOpen} />
+          Menu
         </button>
       </Container>
 

@@ -5,7 +5,7 @@ function ContactPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-300">
           Contact
         </p>
-        <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight md:text-7xl">
+        <h1 className="mt-3 text-5xl font-semibold italic tracking-tight md:text-7xl">
           Work with the editorial desk.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
@@ -27,9 +27,9 @@ function ContactPage() {
           </p>
           <a
             className="mt-5 inline-flex rounded-full bg-zinc-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
-            href="mailto:editorial@velvetrunway.com"
+            href="mailto:editorial@blogindia.com"
           >
-            editorial@velvetrunway.com
+            editorial@blogindia.com
           </a>
         </article>
 
@@ -46,9 +46,9 @@ function ContactPage() {
           </p>
           <a
             className="mt-5 inline-flex rounded-full border border-zinc-200 px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:border-zinc-950"
-            href="mailto:studio@velvetrunway.com"
+            href="mailto:studio@blogindia.com"
           >
-            studio@velvetrunway.com
+            studio@blogindia.com
           </a>
         </article>
       </div>

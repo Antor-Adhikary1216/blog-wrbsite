@@ -10,7 +10,7 @@ function SignUpPage() {
     name: '',
     email: '',
     password: '',
-    adminInviteCode: '',
+    confirmPassword: '',
   })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,10 +24,17 @@ function SignUpPage() {
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      const user = await signUp(form)
+      const { name, email, password } = form
+      const user = await signUp({ name, email, password })
       navigate(user.role === 'admin' ? ROUTES.adminBlogs : ROUTES.blogs)
     } catch (requestError) {
       setError(requestError.message)
@@ -41,7 +48,7 @@ function SignUpPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-800">
         Join the salon
       </p>
-      <h1 className="mt-3 font-serif text-5xl font-semibold italic tracking-tight text-zinc-950">
+      <h1 className="mt-3 text-5xl font-semibold italic tracking-tight text-zinc-950">
         Create account
       </h1>
       <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
@@ -72,12 +79,15 @@ function SignUpPage() {
             onChange={(event) => updateField('password', event.target.value)}
           />
         </FormField>
-        <FormField label="Admin invite code (optional)">
+        <FormField label="Confirm password">
           <input
             className="w-full rounded-lg border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-950"
-            value={form.adminInviteCode}
+            minLength={8}
+            required
+            type="password"
+            value={form.confirmPassword}
             onChange={(event) =>
-              updateField('adminInviteCode', event.target.value)
+              updateField('confirmPassword', event.target.value)
             }
           />
         </FormField>
