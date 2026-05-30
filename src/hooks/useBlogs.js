@@ -33,30 +33,44 @@ function filterFallbackBlogs(params) {
 }
 
 export function useBlogs({ admin = false, params = {}, fallback = true } = {}) {
-  const [blogs, setBlogs] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-
   const paramsKey = useMemo(() => JSON.stringify(params), [params])
   const stableParams = useMemo(() => JSON.parse(paramsKey), [paramsKey])
+  const fallbackList = useMemo(
+    () => (fallback && !admin ? filterFallbackBlogs(stableParams) : []),
+    [admin, fallback, stableParams],
+  )
+  const shouldShowFallbackImmediately = fallbackList.length > 0
+
+  const [blogs, setBlogs] = useState(() => fallbackList)
+  const [isLoading, setIsLoading] = useState(
+    () => !shouldShowFallbackImmediately,
+  )
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     let isMounted = true
 
     async function loadBlogs() {
-      setIsLoading(true)
+      if (shouldShowFallbackImmediately) {
+        setBlogs(fallbackList)
+        setIsLoading(false)
+      } else {
+        setIsLoading(true)
+      }
+
       setError(null)
 
       try {
         const data = admin ? await getAdminBlogs() : await getBlogs(stableParams)
+        const nextBlogs = data.blogs || []
 
         if (isMounted) {
-          setBlogs(data.blogs || [])
+          setBlogs(nextBlogs.length > 0 ? nextBlogs : fallbackList)
         }
       } catch (requestError) {
         if (isMounted) {
           setError(requestError.message)
-          setBlogs(fallback && !admin ? filterFallbackBlogs(stableParams) : [])
+          setBlogs(fallbackList)
         }
       } finally {
         if (isMounted) {
@@ -70,7 +84,7 @@ export function useBlogs({ admin = false, params = {}, fallback = true } = {}) {
     return () => {
       isMounted = false
     }
-  }, [admin, fallback, stableParams])
+  }, [admin, fallbackList, shouldShowFallbackImmediately, stableParams])
 
   return { blogs, isLoading, error, setBlogs }
 }

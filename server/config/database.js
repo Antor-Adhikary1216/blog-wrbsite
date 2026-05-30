@@ -20,9 +20,16 @@ export async function connectDatabase() {
   if (!connectionPromise) {
     connectionPromise = mongoose.connect(env.mongoUri, {
       dbName: env.mongoDbName,
+      serverSelectionTimeoutMS: 8000,
     })
   }
 
-  await connectionPromise
+  try {
+    await connectionPromise
+  } catch (error) {
+    connectionPromise = null
+    throw error
+  }
+
   return mongoose.connection
 }

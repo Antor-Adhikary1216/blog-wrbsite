@@ -1,13 +1,15 @@
 # Blog India
 
 Responsive full-stack India-focused editorial blog built with React, Tailwind
-CSS, Node.js, Express, JWT authentication, role-based access, and MongoDB Atlas.
+CSS, Node.js, Express, Firebase Authentication, role-based access, and MongoDB
+Atlas.
 
 ## Features
 
 - Public India-focused blog homepage, archive, and detail pages.
-- Sign-up, sign-in, logout, JWT auth, and protected account routes.
-- Admin role flow with private invite code.
+- Email/password and Google sign-in powered by Firebase Authentication.
+- Protected account routes and admin access through Firebase custom claims.
+- Login and registration success pop-ups with optional SMTP email notices.
 - Admin blog management: create, edit, publish/draft, feature, and delete.
 - Authenticated comments on published blogs.
 - Clean client folders for pages, routes, layouts, components, hooks, context,
@@ -23,6 +25,8 @@ CSS, Node.js, Express, JWT authentication, role-based access, and MongoDB Atlas.
 - `npm run build` - build the React client.
 - `npm run lint` - lint client and server code.
 - `npm run start` - start the Express API.
+- `npm run admin:set -- user@example.com` - grant the Firebase `admin` custom
+  claim.
 
 ## Environment
 
@@ -34,13 +38,28 @@ PORT=5050
 CLIENT_ORIGIN=http://localhost:5173
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/?retryWrites=true&w=majority
 MONGODB_DB_NAME=blog_website
-JWT_SECRET=replace-with-a-long-random-secret
-JWT_EXPIRES_IN=7d
-ADMIN_INVITE_CODE=replace-with-private-admin-code
+VITE_FIREBASE_API_KEY=your-firebase-web-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+VITE_FIREBASE_APP_ID=your-firebase-app-id
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@example.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nyour-private-key\n-----END PRIVATE KEY-----\n"
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-username
+SMTP_PASS=your-smtp-password
+SMTP_FROM="Blog India <no-reply@example.com>"
 ANTHROPIC_API_KEY=your-anthropic-api-key
 ANTHROPIC_MODEL=claude-3-5-haiku-latest
 ```
 
-Use `ADMIN_INVITE_CODE` during sign-up to create an admin account. Without a
-MongoDB Atlas URI, public pages show demo editorials and API routes return clear
-setup messages.
+Enable Email/password and Google providers in Firebase Console. Use
+`npm run admin:set -- user@example.com` to create an admin after adding Firebase
+Admin SDK credentials to `.env`. Add SMTP values to send login and registration
+success emails. Without SMTP values, users still see the in-app success pop-up.
+Without a MongoDB Atlas URI, public pages use local demo editorials and API
+routes return clear setup messages.

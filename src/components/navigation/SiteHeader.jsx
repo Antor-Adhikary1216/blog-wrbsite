@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import BrandLogo from '../common/BrandLogo.jsx'
 import Container from '../common/Container.jsx'
 import { useAuth } from '../../hooks/useAuth.js'
+import { useToast } from '../../hooks/useToast.js'
 import { PUBLIC_NAV_ITEMS, ROUTES } from '../../routes/routePaths.js'
 
 function getDesktopNavLinkClass({ isActive }) {
@@ -35,14 +36,14 @@ function DesktopNav({ isAdmin }) {
   )
 }
 
-function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
+function MobileNav({ isAdmin, isAuthenticated, onLogout, onNavigate }) {
   const authLinks = isAuthenticated
     ? [
         { label: 'Account', to: ROUTES.account },
         ...(isAdmin ? [{ label: 'Admin Studio', to: ROUTES.adminBlogs }] : []),
       ]
     : [
-        { label: 'Sign in', to: ROUTES.signIn },
+        { label: 'Login', to: ROUTES.signIn },
         { label: 'Join', to: ROUTES.signUp },
       ]
 
@@ -75,7 +76,7 @@ function MobileNav({ isAdmin, isAuthenticated, logout, onNavigate }) {
               className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-semibold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950"
               type="button"
               onClick={() => {
-                logout()
+                void onLogout()
                 onNavigate()
               }}
             >
@@ -110,7 +111,19 @@ function MenuIcon({ isOpen }) {
 
 function SiteHeader() {
   const { isAuthenticated, isAdmin, logout, user } = useAuth()
+  const { showToast } = useToast()
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  async function handleLogout() {
+    await logout()
+    setIsMenuOpen(false)
+    showToast({
+      title: 'Logged out',
+      message: 'You have been signed out successfully.',
+    })
+    navigate(ROUTES.home, { replace: true })
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/75 backdrop-blur-xl">
@@ -142,7 +155,7 @@ function SiteHeader() {
               <button
                 className="rounded-full px-4 py-2 text-sm font-semibold text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
                 type="button"
-                onClick={logout}
+                onClick={handleLogout}
               >
                 Logout
               </button>
@@ -159,7 +172,7 @@ function SiteHeader() {
                 }
                 to={ROUTES.signIn}
               >
-                Sign in
+                Login
               </NavLink>
               <Link
                 className="rounded-full bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-zinc-950/15 transition hover:-translate-y-0.5 hover:bg-emerald-800"
@@ -187,7 +200,7 @@ function SiteHeader() {
         <MobileNav
           isAdmin={isAdmin}
           isAuthenticated={isAuthenticated}
-          logout={logout}
+          onLogout={handleLogout}
           onNavigate={() => setIsMenuOpen(false)}
         />
       ) : null}

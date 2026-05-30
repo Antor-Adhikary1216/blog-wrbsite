@@ -11,6 +11,16 @@ export async function requireDatabase(_request, response, next) {
     await connectDatabase()
     return next()
   } catch (error) {
+    if (
+      error.name === 'MongooseServerSelectionError' ||
+      error.name === 'MongoServerSelectionError'
+    ) {
+      return response.status(503).json({
+        message:
+          'Cannot connect to MongoDB Atlas. Check your Atlas IP whitelist, database user, password, and connection string.',
+      })
+    }
+
     return next(error)
   }
 }

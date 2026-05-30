@@ -1,7 +1,12 @@
 import AuthProvider from './AuthProvider.jsx'
+import ToastProvider from './ToastProvider.jsx'
 
 function AppProvider({ children }) {
-  return <AuthProvider>{children}</AuthProvider>
+  return (
+    <ToastProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ToastProvider>
+  )
 }
 
 export default AppProvider

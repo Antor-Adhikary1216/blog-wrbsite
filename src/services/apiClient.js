@@ -1,5 +1,6 @@
+import { auth as firebaseAuth } from '../config/firebase.js'
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || ''
-const TOKEN_KEY = 'model_blog_token'
 
 export async function apiRequest(path, options = {}) {
   const {
@@ -10,13 +11,16 @@ export async function apiRequest(path, options = {}) {
     ...fetchOptions
   } = options
 
-  const token = getStoredToken()
   const requestHeaders = {
     'Content-Type': 'application/json',
     ...headers,
   }
 
-  if (auth && token) {
+  const token = auth && firebaseAuth.currentUser
+    ? await firebaseAuth.currentUser.getIdToken()
+    : null
+
+  if (token) {
     requestHeaders.Authorization = `Bearer ${token}`
   }
 
@@ -36,16 +40,4 @@ export async function apiRequest(path, options = {}) {
   }
 
   return data
-}
-
-export function getStoredToken() {
-  return localStorage.getItem(TOKEN_KEY)
-}
-
-export function setStoredToken(token) {
-  localStorage.setItem(TOKEN_KEY, token)
-}
-
-export function clearStoredToken() {
-  localStorage.removeItem(TOKEN_KEY)
 }

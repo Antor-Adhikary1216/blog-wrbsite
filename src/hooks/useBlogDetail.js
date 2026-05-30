@@ -3,16 +3,24 @@ import { fallbackBlogs } from '../data/fallbackBlogs.js'
 import { getBlog } from '../services/blogService.js'
 
 export function useBlogDetail(slug) {
-  const [blog, setBlog] = useState(null)
+  const fallbackBlog = fallbackBlogs.find((item) => item.slug === slug)
+  const [blog, setBlog] = useState(() => fallbackBlog || null)
   const [comments, setComments] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(() => !fallbackBlog)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     let isMounted = true
 
     async function loadBlog() {
-      setIsLoading(true)
+      if (fallbackBlog) {
+        setBlog(fallbackBlog)
+        setComments([])
+        setIsLoading(false)
+      } else {
+        setIsLoading(true)
+      }
+
       setError(null)
 
       try {
@@ -23,8 +31,6 @@ export function useBlogDetail(slug) {
           setComments(data.comments || [])
         }
       } catch (requestError) {
-        const fallbackBlog = fallbackBlogs.find((item) => item.slug === slug)
-
         if (isMounted) {
           setBlog(fallbackBlog || null)
           setComments([])
@@ -42,7 +48,7 @@ export function useBlogDetail(slug) {
     return () => {
       isMounted = false
     }
-  }, [slug])
+  }, [fallbackBlog, slug])
 
   return { blog, comments, setComments, isLoading, error }
 }

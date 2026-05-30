@@ -1,85 +1,142 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  clearStoredToken,
-  getStoredToken,
-  setStoredToken,
-} from '../services/apiClient.js'
-import {
-  getCurrentUser,
-  logoutUser,
-  signInUser,
-  signUpUser,
-} from '../services/authService.js'
+  createUserWithEmailAndPassword,
+  getIdTokenResult,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+} from 'firebase/auth'
+import { auth, googleProvider } from '../config/firebase.js'
+import { getCurrentUser } from '../services/authService.js'
 import { AuthContext } from './authContext.js'
+
+function getFirebaseErrorMessage(error) {
+  const messages = {
+    'auth/email-already-in-use': 'Email is already in use.',
+    'auth/invalid-credential': 'Invalid email or password.',
+    'auth/invalid-email': 'Please use a valid email address.',
+    'auth/popup-closed-by-user': 'Google sign-in was closed before finishing.',
+    'auth/weak-password': 'Password should be at least 8 characters.',
+  }
+
+  return messages[error.code] || error.message || 'Authentication failed.'
+}
+
+function clearAuthState(setUser, setToken, setClaims) {
+  setUser(null)
+  setToken(null)
+  setClaims({})
+}
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [token, setToken] = useState(() => getStoredToken())
+  const [token, setToken] = useState(null)
+  const [claims, setClaims] = useState({})
   const [isAuthReady, setIsAuthReady] = useState(false)
+
+  const loadCurrentUser = useCallback(async (firebaseUser, forceRefresh = false) => {
+    if (!firebaseUser) {
+      return { user: null, token: null, claims: {} }
+    }
+
+    const tokenResult = await getIdTokenResult(firebaseUser, forceRefresh)
+    const data = await getCurrentUser()
+
+    return {
+      user: data.user,
+      token: tokenResult.token,
+      claims: tokenResult.claims || {},
+    }
+  }, [])
+
+  const syncCurrentUser = useCallback(
+    async (firebaseUser, forceRefresh = false) => {
+      const nextAuthState = await loadCurrentUser(firebaseUser, forceRefresh)
+
+      setUser(nextAuthState.user)
+      setToken(nextAuthState.token)
+      setClaims(nextAuthState.claims)
+
+      return nextAuthState.user
+    },
+    [loadCurrentUser],
+  )
 
   useEffect(() => {
     let isMounted = true
 
-    async function hydrateUser() {
-      if (!token) {
-        setIsAuthReady(true)
-        return
-      }
-
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        const data = await getCurrentUser()
+        const nextAuthState = await loadCurrentUser(firebaseUser)
 
-        if (isMounted) {
-          setUser(data.user)
+        if (!isMounted) {
+          return
         }
-      } catch {
-        clearStoredToken()
 
+        setUser(nextAuthState.user)
+        setToken(nextAuthState.token)
+        setClaims(nextAuthState.claims)
+      } catch {
         if (isMounted) {
-          setToken(null)
-          setUser(null)
+          clearAuthState(setUser, setToken, setClaims)
         }
       } finally {
         if (isMounted) {
           setIsAuthReady(true)
         }
       }
-    }
-
-    hydrateUser()
+    })
 
     return () => {
       isMounted = false
+      unsubscribe()
     }
-  }, [token])
-
-  const handleAuthSuccess = useCallback((data) => {
-    setStoredToken(data.token)
-    setToken(data.token)
-    setUser(data.user)
-    return data.user
-  }, [])
+  }, [loadCurrentUser])
 
   const signIn = useCallback(
-    async (credentials) => handleAuthSuccess(await signInUser(credentials)),
-    [handleAuthSuccess],
+    async ({ email, password }) => {
+      try {
+        const result = await signInWithEmailAndPassword(auth, email, password)
+        return syncCurrentUser(result.user, true)
+      } catch (error) {
+        throw new Error(getFirebaseErrorMessage(error), { cause: error })
+      }
+    },
+    [syncCurrentUser],
   )
 
   const signUp = useCallback(
-    async (payload) => handleAuthSuccess(await signUpUser(payload)),
-    [handleAuthSuccess],
+    async ({ name, email, password }) => {
+      try {
+        const result = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        )
+
+        await updateProfile(result.user, { displayName: name })
+        return syncCurrentUser(result.user, true)
+      } catch (error) {
+        throw new Error(getFirebaseErrorMessage(error), { cause: error })
+      }
+    },
+    [syncCurrentUser],
   )
 
-  const logout = useCallback(async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
-      if (getStoredToken()) {
-        await logoutUser()
-      }
-    } finally {
-      clearStoredToken()
-      setToken(null)
-      setUser(null)
+      const result = await signInWithPopup(auth, googleProvider)
+      return syncCurrentUser(result.user, true)
+    } catch (error) {
+      throw new Error(getFirebaseErrorMessage(error), { cause: error })
     }
+  }, [syncCurrentUser])
+
+  const logout = useCallback(async () => {
+    await signOut(auth)
+    clearAuthState(setUser, setToken, setClaims)
   }, [])
 
   const value = useMemo(
@@ -88,12 +145,13 @@ function AuthProvider({ children }) {
       token,
       isAuthReady,
       isAuthenticated: Boolean(user && token),
-      isAdmin: user?.role === 'admin',
+      isAdmin: claims.admin === true,
       signIn,
       signUp,
+      signInWithGoogle,
       logout,
     }),
-    [isAuthReady, logout, signIn, signUp, token, user],
+    [claims.admin, isAuthReady, logout, signIn, signInWithGoogle, signUp, token, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

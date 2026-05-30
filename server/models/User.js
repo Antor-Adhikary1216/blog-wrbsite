@@ -3,6 +3,12 @@ import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema(
   {
+    firebaseUid: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     name: {
       type: String,
       required: true,
@@ -20,7 +26,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 8,
       select: false,
     },
@@ -43,7 +48,7 @@ const userSchema = new mongoose.Schema(
 )
 
 userSchema.pre('save', async function hashPassword(next) {
-  if (!this.isModified('password')) {
+  if (!this.password || !this.isModified('password')) {
     return next()
   }
 
@@ -52,6 +57,10 @@ userSchema.pre('save', async function hashPassword(next) {
 })
 
 userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
+  if (!this.password) {
+    return false
+  }
+
   return bcrypt.compare(candidatePassword, this.password)
 }
 

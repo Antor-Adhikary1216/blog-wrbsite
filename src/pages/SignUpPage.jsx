@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { FaGoogle } from 'react-icons/fa'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/common/Button.jsx'
 import FormField from '../components/common/FormField.jsx'
+import PasswordInput from '../components/common/PasswordInput.jsx'
 import { useAuth } from '../hooks/useAuth.js'
+import { useToast } from '../hooks/useToast.js'
 import { ROUTES } from '../routes/routePaths.js'
+import { sendAuthSuccessNotification } from '../services/notificationService.js'
 
 function SignUpPage() {
   const [form, setForm] = useState({
@@ -14,7 +18,9 @@ function SignUpPage() {
   })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { signUp } = useAuth()
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false)
+  const { signInWithGoogle, signUp } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
 
   function updateField(name, value) {
@@ -34,12 +40,42 @@ function SignUpPage() {
 
     try {
       const { name, email, password } = form
-      const user = await signUp({ name, email, password })
-      navigate(user.role === 'admin' ? ROUTES.adminBlogs : ROUTES.blogs)
+      await signUp({ name, email, password })
+      const notification = await sendAuthSuccessNotification('signup')
+
+      showToast({
+        title: 'Account created',
+        message: notification.sent
+          ? 'Welcome to Blog India. A confirmation email has been sent to you.'
+          : 'Welcome to Blog India.',
+      })
+      navigate(ROUTES.home, { replace: true })
     } catch (requestError) {
       setError(requestError.message)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleGoogleSignUp() {
+    setError('')
+    setIsGoogleSubmitting(true)
+
+    try {
+      await signInWithGoogle()
+      const notification = await sendAuthSuccessNotification('signup')
+
+      showToast({
+        title: 'Account ready',
+        message: notification.sent
+          ? 'Welcome to Blog India. A confirmation email has been sent to you.'
+          : 'Welcome to Blog India.',
+      })
+      navigate(ROUTES.home, { replace: true })
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setIsGoogleSubmitting(false)
     }
   }
 
@@ -70,21 +106,17 @@ function SignUpPage() {
           />
         </FormField>
         <FormField label="Password">
-          <input
-            className="w-full rounded-lg border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-950"
+          <PasswordInput
             minLength={8}
             required
-            type="password"
             value={form.password}
             onChange={(event) => updateField('password', event.target.value)}
           />
         </FormField>
         <FormField label="Confirm password">
-          <input
-            className="w-full rounded-lg border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-950"
+          <PasswordInput
             minLength={8}
             required
-            type="password"
             value={form.confirmPassword}
             onChange={(event) =>
               updateField('confirmPassword', event.target.value)
@@ -96,6 +128,20 @@ function SignUpPage() {
           {isSubmitting ? 'Creating...' : 'Create account'}
         </Button>
       </form>
+      <div className="my-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
+        <span className="h-px flex-1 bg-zinc-200" />
+        or
+        <span className="h-px flex-1 bg-zinc-200" />
+      </div>
+      <Button
+        className="w-full gap-3"
+        disabled={isGoogleSubmitting}
+        variant="light"
+        onClick={handleGoogleSignUp}
+      >
+        <FaGoogle aria-hidden="true" />
+        {isGoogleSubmitting ? 'Connecting...' : 'Continue with Google'}
+      </Button>
       <p className="mt-6 text-sm text-zinc-600">
         Already have an account?{' '}
         <Link className="font-semibold text-zinc-950" to={ROUTES.signIn}>
