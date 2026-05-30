@@ -1,15 +1,15 @@
-import { getMongoDatabase, isMongoConfigured } from '../config/mongo.js'
+import { connectDatabase, isDatabaseConfigured } from '../config/database.js'
 
 export async function checkDatabaseConnection() {
-  if (!isMongoConfigured()) {
+  if (!isDatabaseConfigured()) {
     return {
       configured: false,
       message: 'MongoDB Atlas is not configured. Add MONGODB_URI to .env.',
     }
   }
 
-  const database = await getMongoDatabase()
-  await database.command({ ping: 1 })
+  const connection = await connectDatabase()
+  await connection.db.admin().ping()
 
   return {
     configured: true,
